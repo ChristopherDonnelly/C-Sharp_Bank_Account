@@ -34,6 +34,8 @@ namespace Bank_Accounts.Controllers
 
                 User user = _context.User.Include(u => u.Transactions).SingleOrDefault(u => u.UserId == UserId);
 
+                user.Transactions = user.Transactions.OrderByDescending(t => t.CreatedAt).ToList();
+
                 AccountBundle accountBundle = new AccountBundle{ 
                     user = user, 
                     transaction = new Transaction{
@@ -53,8 +55,23 @@ namespace Bank_Accounts.Controllers
         [Route("Transact")]
         public IActionResult Transact(Transaction transaction)
         {
-            _context.Transaction.Add(transaction);
-            _context.SaveChanges();
+            
+            User user = _context.User.Include(u => u.Transactions).SingleOrDefault(u => u.UserId == transaction.UserId);
+            user.Transactions = user.Transactions.OrderByDescending(t => t.CreatedAt).ToList();
+
+            user.Balance += transaction.Amount;
+            
+            TryValidateModel(user);
+
+            if(ModelState.IsValid)
+            {
+                _context.Transaction.Add(transaction);
+                _context.SaveChanges();
+
+                return RedirectToAction("Account");
+            }
+
+            TempData["error"] = "You do not have enough funds to make the Withdrawal!";
 
             return RedirectToAction("Account");
         }

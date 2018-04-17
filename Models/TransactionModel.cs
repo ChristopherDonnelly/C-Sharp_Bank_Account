@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace Bank_Accounts.Models
 {
@@ -9,7 +10,9 @@ namespace Bank_Accounts.Models
         [Key]
         public int TransactionId { get; set; }
 
-        public int Amount { get; set; }
+        [Display(Name = "Deposit/Withdrawal: ")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:C2}")]
+        public double Amount { get; set; } = 0.00;
 
         public int UserId { get; set; }
 
@@ -21,4 +24,5 @@ namespace Bank_Accounts.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
     }
+
 }

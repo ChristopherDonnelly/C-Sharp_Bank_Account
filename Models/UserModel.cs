@@ -23,7 +23,11 @@ namespace Bank_Accounts.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public double Balance { get; set; } = 0;
+
+        [Display(Name = "Current Balance: ")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:C2}")]
+        [Range(0.0, Double.MaxValue, ErrorMessage = "You do not have enough funds to make the Withdrawal!")]
+        public double Balance { get; set; } = 0.00;
 
         public List<Transaction> Transactions { get; set; }
  
