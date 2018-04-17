@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Bank_Accounts.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace Bank_Accounts.Controllers
 {
@@ -72,7 +73,10 @@ namespace Bank_Accounts.Controllers
                     return View("Register");
                 }else{
                     User newUser = model.createUser();
-					
+
+                    PasswordHasher<User> Hasher = new PasswordHasher<User>();
+                    newUser.Password = Hasher.HashPassword(newUser, newUser.Password);
+
 					_context.User.Add(newUser);
                 	_context.SaveChanges();
 				
@@ -95,7 +99,9 @@ namespace Bank_Accounts.Controllers
             model.Found = (user==null)?1:0;
 
             if(model.Found == 0){
-                model.PasswordConfirmation = ((string)user.Password == model.Password)?0:1; 
+                var Hasher = new PasswordHasher<User>();
+
+                model.PasswordConfirmation = (Hasher.VerifyHashedPassword(user, user.Password, model.Password) != 0)?0:1;
             }
 
             TryValidateModel(model);
